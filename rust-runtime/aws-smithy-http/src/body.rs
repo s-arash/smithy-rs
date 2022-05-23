@@ -54,7 +54,7 @@ type BoxBody = http_body::combinators::BoxBody<Bytes, Error>;
 #[pin_project(project = InnerProj)]
 enum Inner {
     Once(#[pin] Option<Bytes>),
-    Streaming(#[pin] hyper::Body),
+    // Streaming(#[pin] hyper::Body),
     Dyn(#[pin] BoxBody),
 
     /// When a streaming body is transferred out to a stream parser, the body is replaced with
@@ -67,7 +67,7 @@ impl Debug for Inner {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self {
             Inner::Once(once) => f.debug_tuple("Once").field(once).finish(),
-            Inner::Streaming(streaming) => f.debug_tuple("Streaming").field(streaming).finish(),
+            // Inner::Streaming(streaming) => f.debug_tuple("Streaming").field(streaming).finish(),
             Inner::Taken => f.debug_tuple("Taken").finish(),
             Inner::Dyn(_) => write!(f, "BoxBody"),
         }
@@ -121,44 +121,46 @@ impl SdkBody {
         self: Pin<&mut Self>,
         cx: &mut Context<'_>,
     ) -> Poll<Option<Result<Bytes, Error>>> {
-        let mut this = self.project();
-        let polling_result = match this.inner.project() {
-            InnerProj::Once(ref mut opt) => {
-                let data = opt.take();
-                match data {
-                    Some(bytes) if bytes.is_empty() => Poll::Ready(None),
-                    Some(bytes) => Poll::Ready(Some(Ok(bytes))),
-                    None => Poll::Ready(None),
-                }
-            }
-            InnerProj::Streaming(body) => body.poll_data(cx).map_err(|e| e.into()),
-            InnerProj::Dyn(box_body) => box_body.poll_data(cx),
-            InnerProj::Taken => {
-                Poll::Ready(Some(Err("A `Taken` body should never be polled".into())))
-            }
-        };
+        unimplemented!("We shouldn't need this")
 
-        match &polling_result {
-            // When we get some bytes back from polling, pass those bytes to each callback in turn
-            Poll::Ready(Some(Ok(bytes))) => {
-                for callback in this.callbacks.iter_mut() {
-                    // Callbacks can run into errors when reading bytes. They'll be surfaced here
-                    callback.update(bytes)?;
-                }
-            }
-            // When we're done polling for bytes, run each callback's `trailers()` method. If any calls to
-            // `trailers()` return an error, propagate that error up. Otherwise, continue.
-            Poll::Ready(None) => {
-                for callback_result in this.callbacks.iter().map(BodyCallback::trailers) {
-                    if let Err(e) = callback_result {
-                        return Poll::Ready(Some(Err(e)));
-                    }
-                }
-            }
-            _ => (),
-        }
+        // let mut this = self.project();
+        // let polling_result = match this.inner.project() {
+        //     InnerProj::Once(ref mut opt) => {
+        //         let data = opt.take();
+        //         match data {
+        //             Some(bytes) if bytes.is_empty() => Poll::Ready(None),
+        //             Some(bytes) => Poll::Ready(Some(Ok(bytes))),
+        //             None => Poll::Ready(None),
+        //         }
+        //     }
+        //     InnerProj::Streaming(body) => body.poll_data(cx).map_err(|e| e.into()),
+        //     InnerProj::Dyn(box_body) => box_body.poll_data(cx),
+        //     InnerProj::Taken => {
+        //         Poll::Ready(Some(Err("A `Taken` body should never be polled".into())))
+        //     }
+        // };
 
-        polling_result
+        // match &polling_result {
+        //     // When we get some bytes back from polling, pass those bytes to each callback in turn
+        //     Poll::Ready(Some(Ok(bytes))) => {
+        //         for callback in this.callbacks.iter_mut() {
+        //             // Callbacks can run into errors when reading bytes. They'll be surfaced here
+        //             callback.update(bytes)?;
+        //         }
+        //     }
+        //     // When we're done polling for bytes, run each callback's `trailers()` method. If any calls to
+        //     // `trailers()` return an error, propagate that error up. Otherwise, continue.
+        //     Poll::Ready(None) => {
+        //         for callback_result in this.callbacks.iter().map(BodyCallback::trailers) {
+        //             if let Err(e) = callback_result {
+        //                 return Poll::Ready(Some(Err(e)));
+        //             }
+        //         }
+        //     }
+        //     _ => (),
+        // }
+
+        // polling_result
     }
 
     /// If possible, return a reference to this body as `&[u8]`
@@ -212,15 +214,15 @@ impl From<Bytes> for SdkBody {
     }
 }
 
-impl From<hyper::Body> for SdkBody {
-    fn from(body: hyper::Body) -> Self {
-        SdkBody {
-            inner: Inner::Streaming(body),
-            rebuild: None,
-            callbacks: Vec::new(),
-        }
-    }
-}
+// impl From<hyper::Body> for SdkBody {
+//     fn from(body: hyper::Body) -> Self {
+//         SdkBody {
+//             inner: Inner::Streaming(body),
+//             rebuild: None,
+//             callbacks: Vec::new(),
+//         }
+//     }
+// }
 
 impl From<Vec<u8>> for SdkBody {
     fn from(data: Vec<u8>) -> Self {
@@ -285,7 +287,7 @@ impl http_body::Body for SdkBody {
         match &self.inner {
             Inner::Once(None) => true,
             Inner::Once(Some(bytes)) => bytes.is_empty(),
-            Inner::Streaming(hyper_body) => hyper_body.is_end_stream(),
+            // Inner::Streaming(hyper_body) => hyper_body.is_end_stream(),
             Inner::Dyn(box_body) => box_body.is_end_stream(),
             Inner::Taken => true,
         }
@@ -295,7 +297,7 @@ impl http_body::Body for SdkBody {
         match &self.inner {
             Inner::Once(None) => SizeHint::with_exact(0),
             Inner::Once(Some(bytes)) => SizeHint::with_exact(bytes.len() as u64),
-            Inner::Streaming(hyper_body) => hyper_body.size_hint(),
+            // Inner::Streaming(hyper_body) => hyper_body.size_hint(),
             Inner::Dyn(box_body) => box_body.size_hint(),
             Inner::Taken => SizeHint::new(),
         }
