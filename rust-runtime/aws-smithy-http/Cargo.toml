@@ -27,7 +27,7 @@ pin-project = "1"
 tracing = "0.1"
 
 # We are using hyper for our streaming body implementation, but this is an internal detail.
-hyper = "=0.10.0"
+hyper = "0.10"
 
 # ByteStream internals
 futures-core = "0.3.14"
