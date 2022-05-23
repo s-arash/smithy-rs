@@ -6,7 +6,7 @@
 #![warn(
     missing_debug_implementations,
     missing_docs,
-    rustdoc::all,
+    // rustdoc::all,
     unreachable_pub
 )]
 

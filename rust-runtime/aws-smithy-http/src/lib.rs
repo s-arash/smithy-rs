@@ -16,6 +16,7 @@
 //! | `event-stream` | Provides Sender/Receiver implementations for Event Stream codegen. |
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![feature(poll_map)]
 
 pub mod body;
 pub mod callback;
