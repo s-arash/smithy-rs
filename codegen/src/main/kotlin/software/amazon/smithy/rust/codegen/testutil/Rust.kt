@@ -290,7 +290,7 @@ private fun String.intoCrate(
         name = ${tempDir.nameWithoutExtension.dq()}
         version = "0.0.1"
         authors = ["rcoh@amazon.com"]
-        edition = "2021"
+        edition = "2018"
 
         [dependencies]
         ${deps.joinToString("\n") { it.toString() }}

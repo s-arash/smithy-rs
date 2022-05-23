@@ -3,7 +3,7 @@ name = "sdk-sync"
 version = "0.1.0"
 authors = ["AWS Rust SDK Team <aws-sdk-rust@amazon.com>"]
 description = "A CLI tool to replay commits from smithy-rs, generate code, and commit that code to aws-rust-sdk"
-edition = "2021"
+edition = "2018"
 license = "Apache-2.0"
 publish = false
 

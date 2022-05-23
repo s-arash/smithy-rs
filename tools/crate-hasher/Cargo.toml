@@ -3,7 +3,7 @@ name = "crate-hasher"
 version = "0.1.0"
 authors = ["AWS Rust SDK Team <aws-sdk-rust@amazon.com>"]
 description = "Tool to deterministically hash a Rust crate's source code"
-edition = "2021"
+edition = "2018"
 license = "Apache-2.0"
 publish = false
 

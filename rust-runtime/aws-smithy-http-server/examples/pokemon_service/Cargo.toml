@@ -1,7 +1,7 @@
 [package]
 name = "pokemon_service"
 version = "0.1.0"
-edition = "2021"
+edition = "2018"
 publish = false
 authors = ["Smithy-rs Server Team <smithy-rs-server@amazon.com>"]
 description = "A smithy Rust service to retrieve information about Pokémon."
