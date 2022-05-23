@@ -250,7 +250,7 @@ impl TryFrom<DateTime> for SystemTime {
 
     fn try_from(date_time: DateTime) -> Result<Self, Self::Error> {
         if date_time.secs() < 0 {
-            let mut secs = date_time.secs().unsigned_abs();
+            let mut secs = date_time.secs().abs() as u64;
             let mut nanos = date_time.subsec_nanos();
             if date_time.has_subsec_nanos() {
                 // This is safe because we just went from a negative number to a positive and are subtracting
@@ -266,7 +266,7 @@ impl TryFrom<DateTime> for SystemTime {
         } else {
             UNIX_EPOCH
                 .checked_add(Duration::new(
-                    date_time.secs().unsigned_abs(),
+                    date_time.secs().abs() as u64,
                     date_time.subsec_nanos(),
                 ))
                 .ok_or(ConversionError(
