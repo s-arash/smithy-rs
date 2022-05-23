@@ -26,7 +26,7 @@ pub(crate) fn format_date(time: SystemTime) -> String {
     format!(
         "{:04}{:02}{:02}",
         time.year(),
-        u8::from(time.month()),
+        time.month() as u8,
         time.day()
     )
 }
@@ -37,7 +37,7 @@ pub(crate) fn format_date_time(time: SystemTime) -> String {
     format!(
         "{:04}{:02}{:02}T{:02}{:02}{:02}Z",
         time.year(),
-        u8::from(time.month()),
+        time.month() as u8,
         time.day(),
         time.hour(),
         time.minute(),

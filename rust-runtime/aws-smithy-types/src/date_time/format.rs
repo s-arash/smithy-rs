@@ -409,7 +409,7 @@ pub(crate) mod rfc3339 {
                 .map_err(out_of_range)?;
             (
                 s.year(),
-                u8::from(s.month()),
+                s.month() as u8,
                 s.day(),
                 s.hour(),
                 s.minute(),
